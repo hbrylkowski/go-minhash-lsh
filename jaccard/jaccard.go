@@ -28,16 +28,6 @@ func (s StringSet) Elements() []string {
 
 func (s StringSet) Intersection(another StringSet) StringSet {
 	intersection := NewStringSet()
-	for _, element := range s.Elements() {
-		if another.Contains(element) {
-			intersection.Add(element)
-		}
-	}
-	return intersection
-}
-
-func (s StringSet) AnotherIntersection(another StringSet) StringSet {
-	intersection := NewStringSet()
 	var elements []string
 	var anotherPointer *StringSet
 	if len(s.set) > len(another.set) {
