@@ -43,3 +43,79 @@ func TestStringSetIntersection(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestStringSetAnotherIntersection(t *testing.T) {
+	stringSet := NewStringSet()
+	stringSet.Add("1")
+	stringSet.Add("2")
+	anotherSet := NewStringSet()
+	anotherSet.Add("3")
+	anotherSet.Add("2")
+	intersection := stringSet.AnotherIntersection(anotherSet)
+	if intersection.Elements()[0] != "2" {
+		t.Fail()
+	}
+	if len(intersection.Elements()) != 1 {
+		t.Fail()
+	}
+}
+
+func BenchmarkStringSet_Intersection(b *testing.B) {
+	setA := NewStringSet()
+	setA.Add("a")
+	setB := NewStringSet()
+	for i := 0; i < 10000; i++ {
+		setB.Add(string(i))
+	}
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		setB.Intersection(setA)
+		setA.Intersection(setB)
+	}
+}
+
+func BenchmarkStringSet_AnotherIntersection(b *testing.B) {
+	setA := NewStringSet()
+	setA.Add("a")
+	setB := NewStringSet()
+	for i := 0; i < 10000; i++ {
+		setB.Add(string(i))
+	}
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		setB.AnotherIntersection(setA)
+		setA.AnotherIntersection(setB)
+	}
+}
+
+func BenchmarkStringSet_IntersectionBalanced(b *testing.B) {
+	setA := NewStringSet()
+	setB := NewStringSet()
+	for i := 0; i < 10000; i++ {
+		setB.Add(string(i))
+		if i < 9500 {
+			setA.Add(string(i+10000))
+		}
+	}
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		setB.Intersection(setA)
+		setA.Intersection(setB)
+	}
+}
+
+func BenchmarkStringSet_AnotherIntersectionBalanced(b *testing.B) {
+	setA := NewStringSet()
+	setB := NewStringSet()
+	for i := 0; i < 10000; i++ {
+		setB.Add(string(i))
+		if i < 9500 {
+			setA.Add(string(i+10000))
+		}
+	}
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		setB.AnotherIntersection(setA)
+		setA.AnotherIntersection(setB)
+	}
+}

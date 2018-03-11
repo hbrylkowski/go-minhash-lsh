@@ -35,3 +35,23 @@ func (s StringSet) Intersection(another StringSet) StringSet {
 	}
 	return intersection
 }
+
+func (s StringSet) AnotherIntersection(another StringSet) StringSet {
+	intersection := NewStringSet()
+	var elements []string
+	var anotherPointer *StringSet
+	if len(s.set) > len(another.set) {
+		elements = another.Elements()
+		anotherPointer = &s
+	} else {
+		elements = s.Elements()
+		anotherPointer = &another
+	}
+
+	for _, element := range elements {
+		if anotherPointer.Contains(element) {
+			intersection.Add(element)
+		}
+	}
+	return intersection
+}
