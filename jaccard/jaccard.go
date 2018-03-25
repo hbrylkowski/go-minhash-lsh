@@ -45,3 +45,23 @@ func (s StringSet) Intersection(another StringSet) StringSet {
 	}
 	return intersection
 }
+
+func JaccardsIndex(setA StringSet, setB StringSet) float64 {
+	intersectionSize := 0
+	var elements []string
+	var anotherPointer *StringSet
+	if len(setA.set) > len(setB.set) {
+		elements = setB.Elements()
+		anotherPointer = &setA
+	} else {
+		elements = setA.Elements()
+		anotherPointer = &setB
+	}
+
+	for _, element := range elements {
+		if anotherPointer.Contains(element) {
+			intersectionSize++
+		}
+	}
+	return float64(intersectionSize) / float64(len(setA.set)+len(setB.set)-intersectionSize)
+}

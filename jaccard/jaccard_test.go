@@ -43,3 +43,15 @@ func TestStringSetIntersection(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestJaccardsIndex(t *testing.T) {
+	stringSet := NewStringSet()
+	stringSet.Add("1")
+	stringSet.Add("2")
+	anotherSet := NewStringSet()
+	anotherSet.Add("3")
+	anotherSet.Add("2")
+	if JaccardsIndex(stringSet, anotherSet) != float64(1) / float64(3){
+		t.Fail()
+	}
+}
