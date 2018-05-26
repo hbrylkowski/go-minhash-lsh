@@ -1,35 +1,57 @@
 package main
 
 import (
-	"strings"
 	"github.com/hbrylkowski/lsh/jaccard"
 	"github.com/tjarratt/babble"
 	"math/rand"
-	"github.com/hbrylkowski/lsh/minhash"
-	"time"
+	"strings"
 	"fmt"
 	"math"
 )
-const minHashSize = 1000
-var minHash = minhash.NewMinhash(minHashSize, time.Now().UTC().UnixNano())
 
 func main() {
-	var diff float64 = 0
-	tries := 1000
-	for i := 0; i < tries; i++ {
-		first, second := createSentencesPair()
-		diff += math.Abs(jaccard.JaccardsIndex(first, second) - multipleMinHashes(first, second))
-	}
-	fmt.Println(float64(diff) / float64(tries))
-
 }
-func createSentencesPair() (jaccard.StringSet, jaccard.StringSet){
+
+func greatestCommonDivisor(a int, b int) int {
+	if b == 0{
+		return a
+	}
+	return greatestCommonDivisor(b, a%b)
+}
+
+func getSmallestMultiplier(b float64) int {
+	precision := len(fmt.Sprint(b)) - strings.Index(fmt.Sprint(b), ".") - 1
+	limit := int(math.Pow10(precision))
+	divisor := greatestCommonDivisor(int(b* float64(limit)), limit)
+	return limit / divisor
+}
+
+func newBabble() func(int) string {
 	babbler := babble.NewBabbler()
 	babbler.Separator = " "
-	babbler.Count = rand.Int() % 90 + 10
-	first := babbler.Babble()
-	babbler.Count += rand.Int() % 20
-	second := first + " " + babbler.Babble()
+	return func(a int) string {
+		babbler.Count = a
+		return babbler.Babble()
+	}
+}
+
+
+func createSentencesPair(similarity float64) (jaccard.StringSet, jaccard.StringSet){
+	n := getSmallestMultiplier(similarity) * ((rand.Int() % 1) + 1)
+	x := int(float64(n) * similarity)
+	a := rand.Int() % (n-x)
+	b := n - x - a
+
+	babbler := newBabble()
+	core := babbler(x)
+	first := core
+	second := core
+	if a > 0 {
+		first += " " + babbler(a)
+	}
+	if b > 0 {
+		second += " " + babbler(b)
+	}
 	return sentenceToSet(first), sentenceToSet(second)
 
 }
@@ -42,22 +64,3 @@ func sentenceToSet(sentence string) jaccard.StringSet {
 	return set
 }
 
-func multipleMinHashes(sentenceA jaccard.StringSet, sentenceB jaccard.StringSet) float64{
-	commonMinHashElements := [minHashSize + 1]int64{}
-	for i := 0; i < 10; i++{
-		minHashA := minHash(sentenceA.Elements())
-		minHashB := minHash(sentenceB.Elements())
-		agreed := 0
-		for i, h := range minHashA {
-			if h == minHashB[i]{
-				agreed++
-			}
-		}
-		commonMinHashElements[agreed]++
-	}
-	var sum float64 = 0
-	for i, s := range commonMinHashElements {
-		sum += float64(i)/float64(minHashSize) * float64(s)
-	}
-	return sum / float64(10)
-}

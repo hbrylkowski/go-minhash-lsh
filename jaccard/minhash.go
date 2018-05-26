@@ -1,4 +1,4 @@
-package minhash
+package jaccard
 
 import (
 	"math/rand"
@@ -8,10 +8,11 @@ import (
 
 type CalculateMinhash func(words []string) []uint64
 
-func NewMinhash(elements int, seed int64) CalculateMinhash {
+func NewMinhash(elements uint64, seed int64) CalculateMinhash {
 	var randomNumbers []uint64
 	rand.Seed(seed)
-	for i := 0; i < elements; i++ {
+	var i uint64
+	for ; i < elements; i++ {
 		randomNumbers = append(randomNumbers, rand.Uint64())
 	}
 	return func(words []string) []uint64{
